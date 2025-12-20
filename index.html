@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daily AI Personal Coach</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex items-center justify-center p-4">
+
+  <div class="bg-white w-full max-w-md rounded-2xl shadow-xl p-6 space-y-4">
+    <h1 class="text-2xl font-bold text-center text-gray-800">
+      Daily AI Personal Coach
+    </h1>
+
+    <p class="text-sm text-gray-500 text-center">
+      Enter your main goal for today and get AI-powered guidance.
+    </p>
+
+    <form id="goalForm" class="space-y-3">
+      <input
+        id="goalInput"
+        type="text"
+        placeholder="e.g. Finish my project report"
+        class="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+        required
+      />
+
+      <button
+        type="submit"
+        class="w-full bg-indigo-600 text-white p-3 rounded-lg font-semibold hover:bg-indigo-700 transition"
+      >
+        Get AI Advice
+      </button>
+    </form>
+
+    <div id="output" class="hidden bg-gray-50 rounded-lg p-4">
+      <h2 class="font-semibold mb-2 text-gray-700">AI Coach says:</h2>
+      <p id="feedback" class="text-gray-700 text-sm"></p>
+    </div>
+  </div>
+
+  <script>
+    // 🔴 REPLACE THIS WITH YOUR N8N WEBHOOK URL
+    const N8N_WEBHOOK_URL = "https://YOUR-N8N-DOMAIN/webhook/daily-ai-coach";
+
+    const form = document.getElementById("goalForm");
+    const input = document.getElementById("goalInput");
+    const output = document.getElementById("output");
+    const feedback = document.getElementById("feedback");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      feedback.textContent = "Thinking...";
+      output.classList.remove("hidden");
+
+      try {
+        const res = await fetch(N8N_WEBHOOK_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ goal: input.value })
+        });
+
+        const data = await res.json();
+        feedback.textContent = data.feedback || "No response from AI.";
+        input.value = "";
+      } catch (err) {
+        feedback.textContent = "Something went wrong. Try again.";
+      }
+    });
+  </script>
+
+</body>
+</html>
